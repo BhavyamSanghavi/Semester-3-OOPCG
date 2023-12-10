@@ -6,7 +6,6 @@
 using namespace std;
 QImage img(300,300,QImage::Format_RGB888);
 QImage img_1(300,300,QImage::Format_RGB888);
-
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -18,26 +17,55 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::line(int x1, int y1, int x2, int y2)
+{
+    float dx = x2 - x1;
+    float dy = y2 - y1;
+    float length;
+    if (abs(dx)>abs(dy)){
+        length = abs(dx);
+    }
+    else {
+        length = abs(dy);
+    }
+    float xinc = dx/length;
+    float yinc = dy/length;
+    int sign;
+    if(dx>0){sign = +1;}
+    else if(dx == 0){sign = 0;}
+    else{sign = -1;}
+    float x = x1+0.5*(sign);
+    float y = y1+0.5*(sign);
+    for(int i = 0; i<= length; i++){
+        x = x + xinc;
+        y = y + yinc;
+        img.setPixel(int(x),int(y),qRgb(255,300,205));
+    }
+}
+
 void MainWindow::line_1(int x1, int y1, int x2, int y2)
 {
     float dx = x2 - x1;
     float dy = y2 - y1;
     float length;
-    if (abs(dx)>abs(dy))  length = abs(dx);
-    else length = abs(dy);
+    if (abs(dx)>abs(dy)){
+        length = abs(dx);
+    }
+    else {
+        length = abs(dy);
+    }
     float xinc = dx/length;
     float yinc = dy/length;
     int sign;
-    if(dx>0) sign = +1;
-    else if(dx == 0) sign = 0;
-    else sign = -1;
+    if(dx>0){sign = +1;}
+    else if(dx == 0){sign = 0;}
+    else{sign = -1;}
     float x = x1+0.5*(sign);
     float y = y1+0.5*(sign);
-    for(int i = 0; i<= length; i++)
-    {
+    for(int i = 0; i<= length; i++){
         x = x + xinc;
         y = y + yinc;
-        img.setPixel(int(x),int(y),qRgb(255,255,255));
+        img_1.setPixel(int(x),int(y),qRgb(150,180,200));
     }
 }
 
@@ -47,6 +75,14 @@ void MainWindow::window()
     line(200,100,200,200);
     line(200,200,100,200);
     line(100,200,100,100);
+}
+
+void MainWindow::window_1()
+{
+    line_1(100,100,200,100);
+    line_1(200,100,200,200);
+    line_1(200,200,100,200);
+    line_1(100,200,100,100);
 }
 
 void MainWindow::outcode_init(int a[], int x, int y)
@@ -59,18 +95,18 @@ void MainWindow::outcode_init(int a[], int x, int y)
 
 void MainWindow::on_pushButton_clicked()
 {
-    x1=ui->textEdit->toPlainText().toInt();
-    y1=ui->textEdit_2->toPlainText().toInt();
-    x2=ui->textEdit_3->toPlainText().toInt();
-    y2=ui->textEdit_4->toPlainText().toInt();
-    line(x1,y1,x2,y2);
-    window();
-    ui->label->setPixmap(QPixmap::fromImage(img));
+        x1=ui->textEdit->toPlainText().toInt();
+        y1=ui->textEdit_2->toPlainText().toInt();
+        x2=ui->textEdit_3->toPlainText().toInt();
+        y2=ui->textEdit_4->toPlainText().toInt();
+        line(x1,y1,x2,y2);
+        window();
+        ui->label->setPixmap(QPixmap::fromImage(img));
 }
 
 void MainWindow::on_pushButton_2_clicked()
 {
-    window();
+    window_1();
     float x,y;
     float m;
     int outcode[4]={0,0,0,0};
@@ -80,49 +116,40 @@ void MainWindow::on_pushButton_2_clicked()
 
     m=(y2-y1)/(x2-x1);
 
-    if((outcode[0]&outcode_1[0])!=0 || (outcode[1]&outcode_1[1])!=0 || (outcode[2]&outcode_1[2])!=0 || (outcode[3]&outcode_1[3])!=0)
-    {
+    if((outcode[0]&outcode_1[0])!=0 or (outcode[1]&outcode_1[1])!=0 or (outcode[2]&outcode_1[2])!=0 or (outcode[3]&outcode_1[3])!=0){
         line_1(x1,y1,x2,y2);
     }
-
     else{
-        if(outcode[3]==1)
-        {
+        if(outcode[3]==1){
             y=m*(100-x2)+y2;
             line_1(100,y,x2,y2);
         }
-        else if(outcode_1[3]==1)
-        {
+        else if(outcode_1[3]==1){
             y=m*(100-x2)+y2;
             line_1(100,y,x1,y1);
         }
-        else if(outcode[2]==1)
-        {
+        else if(outcode[2]==1){
+
             y=m*(200-x2)+y2;
             line_1(200,y,x2,y2);
         }
-        else if(outcode_1[2]==1)
-        {
+        else if(outcode_1[2]==1){
             y=m*(200-x2)+y2;
             line_1(200,y,x1,y1);
         }
-        else if(outcode[1]==1)
-        {
+        else if(outcode[1]==1){
             x=x2+(100-y2)/m;
             line_1(x,100,x2,y2);
         }
-        else if(outcode_1[1]==1)
-        {
+        else if(outcode_1[1]==1){
             x=x2+(100-y2)/m;
             line_1(x,100,x1,y1);
         }
-        else if(outcode[0]==1)
-        {
+        else if(outcode[0]==1){
             x=x2+(100-y2)/m;
             line_1(x,200,x2,y2);
         }
-        else if(outcode_1[0]==1)
-        {
+        else if(outcode_1[0]==1){
             x=x2+(100-y2)/m;
             line_1(x,200,x1,y1);
         }
